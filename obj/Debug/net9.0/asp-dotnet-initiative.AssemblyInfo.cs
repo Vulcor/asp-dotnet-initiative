@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("asp-dotnet-initiative")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+faee4cd716e8572f02e42e25a50392eb7b13566e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2b716910d6e553fff7f2045fbb03fbe09634d212")]
 [assembly: System.Reflection.AssemblyProductAttribute("asp-dotnet-initiative")]
 [assembly: System.Reflection.AssemblyTitleAttribute("asp-dotnet-initiative")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

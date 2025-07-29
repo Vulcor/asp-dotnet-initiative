@@ -1,0 +1,46 @@
+
+@model asp_dotnet_initiative.Models.TaskViewModel
+
+<h1>Task List</h1>
+
+<form asp-action="Create" method="post" class="mb-4">
+    <div class="form-group">
+        <label for="title">Task Title</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Add Task</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Is Done</th>
+            <th>Creation Date</th>
+            <th>Completion Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var task in Model.ExistingTasks)
+    {
+        <tr>
+            <td>@task.Title</td>
+            <td>@task.IsCompleted</td>
+            <td>@task.CreatedAt</td>
+            <td>@(task.CompletedAt.HasValue ? task.CompletedAt.Value.ToString("g") : "Not completed")</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-secondary">Edit</a>
+                <form asp-action="Delete" asp-route-id="@task.Id" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
