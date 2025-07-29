@@ -96,5 +96,19 @@ namespace asp_dotnet_initiative.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleComplete(int id)
+        {
+            var task = await _context.TaskItems.FindAsync(id);
+            if (task == null) return NotFound();
+
+            task.IsCompleted = !task.IsCompleted;
+            task.UpdatedAt = DateTime.Now;
+            task.CompletedAt = task.IsCompleted ? DateTime.Now : null;
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
     }
 }

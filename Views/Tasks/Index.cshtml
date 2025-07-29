@@ -15,8 +15,8 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Title</th>
             <th>Is Done</th>
+            <th>Title</th>
             <th>Creation Date</th>
             <th>Completion Date</th>
             <th>Actions</th>
@@ -26,10 +26,20 @@
     @foreach (var task in Model.ExistingTasks)
     {
         <tr>
+            <td>
+                <form asp-action="ToggleComplete" method="post" class="d-inline">
+                    <input type="hidden" name="id" value="@task.Id" />
+                    <input type="checkbox" onchange="this.form.submit()" @(task.IsCompleted ? "checked" : "") />
+                </form>
+            </td>
             <td>@task.Title</td>
-            <td>@task.IsCompleted</td>
             <td>@task.CreatedAt</td>
-            <td>@(task.CompletedAt.HasValue ? task.CompletedAt.Value.ToString("g") : "Not completed")</td>
+             <td>
+            @if (task.CompletedAt.HasValue)
+                {
+                    <span class="text-success">@task.CompletedAt.Value.ToString("g")</span>
+                }
+            </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-secondary">Edit</a>
                 <form asp-action="Delete" asp-route-id="@task.Id" method="post" class="d-inline">
