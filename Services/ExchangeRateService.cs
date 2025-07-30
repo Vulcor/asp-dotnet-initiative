@@ -7,6 +7,9 @@ public class ExchangeRateService
     private readonly string _apiUrl;
     private readonly string _apiKey;
 
+    private Dictionary<string, double?> _cachedRates = new();
+    private DateTime _lastFetchTime = DateTime.MinValue;
+
     public ExchangeRateService(HttpClient httpClient, IOptions<ExchangeRateApiOptions> options)
     {
         _httpClient = httpClient;
@@ -16,9 +19,14 @@ public class ExchangeRateService
 
     public async Task<Dictionary<string, double?>> GetConversionRatesAsync((string from, string to)[] pairs)
     {
+        if ((DateTime.UtcNow - _lastFetchTime) < TimeSpan.FromMinutes(10))
+        {
+            return _cachedRates;
+        }
+
         string url = $"{_apiUrl}?access_key={_apiKey}";
         var response = await _httpClient.GetAsync(url);
-        if (!response.IsSuccessStatusCode) return null!;
+        if (!response.IsSuccessStatusCode) return _cachedRates;
 
         var content = await response.Content.ReadAsStringAsync();
         var json = JsonDocument.Parse(content);
@@ -39,7 +47,7 @@ public class ExchangeRateService
                 result[key] = 1.0 / reverse.GetDouble();
             }
             else if (quotes.TryGetProperty("USD" + from, out var fromRate) &&
-                    quotes.TryGetProperty("USD" + to, out var toRate))
+                     quotes.TryGetProperty("USD" + to, out var toRate))
             {
                 result[key] = toRate.GetDouble() / fromRate.GetDouble();
             }
@@ -48,6 +56,9 @@ public class ExchangeRateService
                 result[key] = null;
             }
         }
+
+        _cachedRates = result;
+        _lastFetchTime = DateTime.UtcNow;
 
         return result;
     }

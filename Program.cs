@@ -18,11 +18,15 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
 
-if (!app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseHttpsRedirection();
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<AppDbContext>();
+    var env = services.GetRequiredService<IWebHostEnvironment>();
+    TaskItemSeeder.Seed(context, env);
 }
 
 app.UseStaticFiles();
