@@ -3,6 +3,33 @@
 
 <h1>Task List</h1>
 
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Tasks</h5>
+                <p class="card-text">@Model.TotalCount</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Completed</h5>
+                <p class="card-text">@Model.CompletedCount</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Pending</h5>
+                <p class="card-text">@Model.PendingCount</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <form asp-action="Create" method="post" class="mb-4">
     <div class="form-group">
         <label for="title">Task Title</label>
@@ -11,6 +38,43 @@
     </div>
     <button type="submit" class="btn btn-primary mt-2">Add Task</button>
 </form>
+
+<p>
+    Sort by:
+    @{
+        string currentSortBy = ViewBag.SortBy as string ?? "created";
+        string currentSortDir = ViewBag.SortDir as string ?? "desc";
+
+        string GetDirectionIcon(string sortBy) =>
+            currentSortBy == sortBy
+                ? (currentSortDir == "asc" ? "🔼" : "🔽")
+                : "";
+    }
+
+    <a class="@(currentSortBy == "created" ? "fw-bold text-primary" : "")"
+        asp-action="Index"
+        asp-route-sortBy="created"
+        asp-route-sortDir="@(currentSortBy == "created" && currentSortDir == "asc" ? "desc" : "asc")"
+        asp-route-page="@Model.CurrentPage">
+        Creation Date @GetDirectionIcon("created")
+    </a>
+    |
+    <a class="@(currentSortBy == "completed" ? "fw-bold text-primary" : "")"
+        asp-action="Index"
+        asp-route-sortBy="completed"
+        asp-route-sortDir="@(currentSortBy == "completed" && currentSortDir == "asc" ? "desc" : "asc")"
+        asp-route-page="@Model.CurrentPage">
+        Completion Status @GetDirectionIcon("completed")
+    </a>
+    |
+    <a class="@(currentSortBy == "title" ? "fw-bold text-primary" : "")"
+        asp-action="Index"
+        asp-route-sortBy="title"
+        asp-route-sortDir="@(currentSortBy == "title" && currentSortDir == "asc" ? "desc" : "asc")"
+        asp-route-page="@Model.CurrentPage">
+        Title @GetDirectionIcon("title")
+    </a>
+</p>
 
 <table class="table">
     <thead>
@@ -28,6 +92,7 @@
         <tr>
             <td>
                 <form asp-action="ToggleComplete" method="post" class="d-inline">
+                    <!-- I would like this to be an AJAX call, but I didn't have time to implement it -->
                     <input type="hidden" name="id" value="@task.Id" />
                     <input type="checkbox" onchange="this.form.submit()" @(task.IsCompleted ? "checked" : "") />
                 </form>
@@ -50,6 +115,31 @@
     }
     </tbody>
 </table>
+
+<div class="row mt-4 align-items-center">
+    <div class="col-auto">
+        <span class="fw-bold">Pages:</span>
+    </div>
+    <div class="col">
+        <nav aria-label="Task pagination">
+            <ul class="pagination mb-0">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link"
+                            asp-action="Index"
+                            asp-route-page="@i"
+                            asp-route-sortBy="@ViewBag.SortBy"
+                            asp-route-sortDir="@ViewBag.SortDir">
+                            @i
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

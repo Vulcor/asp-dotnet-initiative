@@ -15,13 +15,46 @@ namespace asp_dotnet_initiative.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+            int page = 1,
+            int pageSize = 10,
+            string sortBy = "created",
+            string sortDir = "desc")
         {
-            var tasks = await _context.TaskItems.ToListAsync();
+            ViewBag.SortBy = sortBy;
+            ViewBag.SortDir = sortDir;
+
+            IQueryable<TaskItem> query = _context.TaskItems;
+
+            query = (sortBy, sortDir.ToLower()) switch
+            {
+                ("created", "asc") => query.OrderBy(t => t.CreatedAt),
+                ("created", "desc") => query.OrderByDescending(t => t.CreatedAt),
+
+                ("completed", "asc") => query.OrderBy(t => t.IsCompleted).ThenBy(t => t.CompletedAt),
+                ("completed", "desc") => query.OrderByDescending(t => t.IsCompleted).ThenByDescending(t => t.CompletedAt),
+
+                ("title", "asc")       => query.OrderBy(t => t.Title),
+                ("title", "desc")      => query.OrderByDescending(t => t.Title),
+
+                _ => query.OrderByDescending(t => t.CreatedAt)
+            };
+            
+            var totalCount = await query.CountAsync();
+
+            var pagedTasks = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             var viewModel = new TaskViewModel
             {
-                ExistingTasks = tasks
+                ExistingTasks = pagedTasks,
+                TotalCount = totalCount,
+                CompletedCount = await _context.TaskItems.CountAsync(t => t.IsCompleted),
+                PendingCount = await _context.TaskItems.CountAsync(t => !t.IsCompleted),
+                CurrentPage = page,
+                PageSize = pageSize
             };
             return View(viewModel);
         }
