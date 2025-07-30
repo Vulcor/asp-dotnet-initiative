@@ -89,27 +89,37 @@
     <tbody>
     @foreach (var task in Model.ExistingTasks)
     {
-        <tr>
+        <tr class="task-row" data-task-id="@task.Id">
             <td>
                 <form asp-action="ToggleComplete" method="post" class="d-inline">
-                    <!-- I would like this to be an AJAX call, but I didn't have time to implement it -->
                     <input type="hidden" name="id" value="@task.Id" />
                     <input type="checkbox" onchange="this.form.submit()" @(task.IsCompleted ? "checked" : "") />
                 </form>
             </td>
-            <td>@task.Title</td>
+            <td>
+                @task.Title
+                <br />
+                <a href="#" class="toggle-description text-sm">Show Description</a>
+            </td>
             <td>@task.CreatedAt</td>
-             <td>
-            @if (task.CompletedAt.HasValue)
-                {
-                    <span class="text-success">@task.CompletedAt.Value.ToString("g")</span>
-                }
+            <td>
+                @if (task.CompletedAt.HasValue)
+                    {
+                        <span class="text-success">@task.CompletedAt.Value.ToString("g")</span>
+                    }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-secondary">Edit</a>
                 <form asp-action="Delete" asp-route-id="@task.Id" method="post" class="d-inline">
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
+            </td>
+        </tr>
+        <tr class="task-description-row" style="display:none;" data-id="@task.Id">
+            <td class="description-cell" colspan="">
+                <div class="task-description">
+                    This is the description for <strong>@task.Title</strong>.
+                </div>
             </td>
         </tr>
     }
@@ -143,4 +153,19 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // neat thing to dynamically set colspan for all of the rows
+            // that we're gonna push into the table
+            var columnCount = $("table thead tr th").length;
+            $(".description-cell").attr("colspan", columnCount);
+
+            $(".toggle-description").click(function (e) {
+                e.preventDefault();
+                var id = $(this).closest(".task-row").data("task-id");
+                $(".task-description-row[data-id='" + id + "']").slideToggle();
+            });
+        });
+    </script>
 }
