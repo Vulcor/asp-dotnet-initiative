@@ -3,19 +3,26 @@
 <div id="exchangeMenu" class="bg-light border p-3">
     <h5>Exchange Rates</h5>
     <ul class="list-unstyled">
-    @foreach (var rate in Model)
-    {
-        <li>
-            <strong>@rate.Key:</strong>
-            @if (rate.Value.HasValue)
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var rate in Model)
             {
-                @rate.Value.Value.ToString("F5")
+                <li>
+                    <strong>@rate.Key:</strong>
+                    @if (rate.Value.HasValue)
+                    {
+                        @rate.Value.Value.ToString("F5")
+                    }
+                    else
+                    {
+                        <span class="text-muted">N/A</span>
+                    }
+                </li>
             }
-            else
-            {
-                <span class="text-muted">N/A</span>
-            }
-        </li>
-    }
+        }
+        else
+        {
+            <div class="text-danger">Unable to load exchange rates.</div>
+        }
     </ul>
 </div>
