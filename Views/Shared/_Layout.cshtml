@@ -30,6 +30,14 @@
                         </li>
                     </ul>
                 </div>
+                <div class="dropdown" style="position: relative;">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Exchange Rates
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-start p-3 mt-2 shadow rounded" style="min-width: 15rem; right: 0; left: auto;">
+                        @await Component.InvokeAsync("ExchangeMenu")
+                    </div>
+                </div>
             </div>
         </nav>
     </header>

@@ -1,0 +1,21 @@
+@model Dictionary<string, double?>
+
+<div id="exchangeMenu" class="bg-light border p-3">
+    <h5>Exchange Rates</h5>
+    <ul class="list-unstyled">
+    @foreach (var rate in Model)
+    {
+        <li>
+            <strong>@rate.Key:</strong>
+            @if (rate.Value.HasValue)
+            {
+                @rate.Value.Value.ToString("F5")
+            }
+            else
+            {
+                <span class="text-muted">N/A</span>
+            }
+        </li>
+    }
+    </ul>
+</div>
